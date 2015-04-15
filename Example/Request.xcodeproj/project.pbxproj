@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0D275CC41ADE5272002097FA /* Request.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D275CC31ADE5272002097FA /* Request.m */; };
+		0D275CC91ADE5458002097FA /* Request.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D275CC81ADE5458002097FA /* Request.m */; };
 		572B1ECA84D4CB82150B9692 /* libPods-Request.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 532D8B78B0F666C1957DE4D2 /* libPods-Request.a */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
@@ -38,8 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0D275CC21ADE5272002097FA /* Request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Request.h; sourceTree = "<group>"; };
-		0D275CC31ADE5272002097FA /* Request.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Request.m; sourceTree = "<group>"; };
+		0D275CC71ADE5458002097FA /* Request.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Request.h; sourceTree = "<group>"; };
+		0D275CC81ADE5458002097FA /* Request.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Request.m; sourceTree = "<group>"; };
 		1F17E30CBD29B09A56B3BAD6 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		2028545698D0C1E87B93675A /* libPods-Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3C4E80071865925DC966939D /* Pods-Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Tests/Pods-Tests.release.xcconfig"; sourceTree = "<group>"; };
@@ -109,19 +109,20 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
-		0D275CC01ADE5272002097FA /* Pod */ = {
+		0D275CC51ADE5458002097FA /* Pod */ = {
 			isa = PBXGroup;
 			children = (
-				0D275CC11ADE5272002097FA /* Classes */,
+				0D275CC61ADE5458002097FA /* Classes */,
 			);
-			path = Pod;
-			sourceTree = SOURCE_ROOT;
+			name = Pod;
+			path = ../../Pod;
+			sourceTree = "<group>";
 		};
-		0D275CC11ADE5272002097FA /* Classes */ = {
+		0D275CC61ADE5458002097FA /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				0D275CC21ADE5272002097FA /* Request.h */,
-				0D275CC31ADE5272002097FA /* Request.m */,
+				0D275CC71ADE5458002097FA /* Request.h */,
+				0D275CC81ADE5458002097FA /* Request.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -163,7 +164,7 @@
 		6003F593195388D20070C39A /* Request */ = {
 			isa = PBXGroup;
 			children = (
-				0D275CC01ADE5272002097FA /* Pod */,
+				0D275CC51ADE5458002097FA /* Pod */,
 				6003F59C195388D20070C39A /* JMAppDelegate.h */,
 				6003F59D195388D20070C39A /* JMAppDelegate.m */,
 				6003F59F195388D20070C39A /* Main_iPhone.storyboard */,
@@ -383,7 +384,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6003F59E195388D20070C39A /* JMAppDelegate.m in Sources */,
-				0D275CC41ADE5272002097FA /* Request.m in Sources */,
+				0D275CC91ADE5458002097FA /* Request.m in Sources */,
 				6003F5A7195388D20070C39A /* JMViewController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 			);
