@@ -7,7 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Request.h"
 
-@interface JMViewController : UIViewController
+@interface JMViewController : UIViewController<RequestDelegate>{
+    
+    //For example a request for login
+    Request *_requestLogin;
+}
+
+-(IBAction)login;
 
 @end
