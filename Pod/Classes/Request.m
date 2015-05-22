@@ -11,6 +11,9 @@
 
 @implementation Request
 
+NSString *const POST = @"post";
+NSString *const GET = @"get";
+
 @synthesize _responseObject;
 @synthesize _url;
 
@@ -19,50 +22,72 @@
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     manager.requestSerializer = [AFHTTPRequestSerializer serializer];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    
     [self setDictionary:params];
     
-    AFHTTPRequestOperation *op = [manager POST:_url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-    } success:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"Success: %@", responseObject);
-    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"Error: %@", error);
-    }];
+    /** Comprobamos si tenemos cache para esta peticion **/
+    NSArray * cache = [self getCache];
     
-    [op setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite){
-        
-        //long long int x = totalBytesWritten;
-        //long long int y = totalBytesExpectedToWrite;
-        
-    }];
+    if(cache){
+        _responseObject = cache;
+        [self.delegate request:self];
+    }else{
+        if([_type isEqual:POST]){
+            [self post:manager];
+        }else if([_type isEqual:GET]){
+            [self get:manager];
+        }
+    }
+}
+
+-(void) get:(AFHTTPRequestOperationManager *) manager{
+    [manager GET:_url parameters:self.dictionary
+          success:^(AFHTTPRequestOperation *operation, id responseObject)
+     {
+         [self checkObject:responseObject];
+     }failure:
+     ^(AFHTTPRequestOperation *operation, NSError *error) {
+         NSLog(@"El error es: %@", [error description]);
+         [self.delegate noRequest:self];
+     }];
+
+}
+
+-(void) post:(AFHTTPRequestOperationManager *) manager{
+    [manager POST:_url parameters:self.dictionary
+          success:^(AFHTTPRequestOperation *operation, id responseObject)
+     {
+        [self checkObject:responseObject];
+     }failure:
+     ^(AFHTTPRequestOperation *operation, NSError *error) {
+         NSLog(@"El error es: %@", [error description]);
+         [self.delegate noRequest:self];
+     }];
+}
+
+-(void) checkObject: (id) responseObject{
+    Boolean complete = false;
     
-    [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+    if(_hasExpected){
         NSString *expected1 = [NSString stringWithFormat:@"%@",[responseObject objectForKey:[_expected objectForKey:@"expected1"]] ];
         NSString *value1 = [_expected objectForKey:@"value1"];
         NSString *expected2 = [NSString stringWithFormat:@"%@",[responseObject objectForKey:[_expected objectForKey:@"expected2"]] ];
         NSString *value2 = [_expected objectForKey:@"value2"];
         
         if([expected1 isEqualToString:value1] && [expected2 isEqualToString:value2]){
-            _responseObject = responseObject;
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.delegate request:self];
-            });
-            
-        }else{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self.delegate noRequest:self];
-            });
+            complete = true;
         }
-        
-        
-    }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"Error: %@", error);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate noRequest:self];
-        });
-    }];
+    }else{
+        complete = true;
+    }
     
-    [op start];
+    if(complete){
+        _responseObject = responseObject;
+        //Guardamos en cache
+        [self saveInDisk];
+        [self.delegate request:self];
+    }else{
+        [self.delegate noRequest:self];
+    }
 }
 
 -(void)requestImage: (NSDictionary*) params andImage: (NSData *) img{
@@ -156,6 +181,7 @@
 }
 
 -(void)setExpected:(NSDictionary*)expected{
+    _hasExpected = true;
     _expected = expected;
 }
 
@@ -188,4 +214,21 @@
     [_alertViewLog dismissWithClickedButtonIndex:-1 animated:YES];
 }
 
+#pragma marks - cache
+-(void) saveInDisk{
+    [_responseObject writeToFile: [self getPath] atomically:YES];
+}
+
+-(NSArray*) getCache{
+    return [NSArray arrayWithContentsOfFile: [self getPath]];
+}
+
+-(NSString*) getPath{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                         NSUserDomainMask, YES);
+    NSString *path = [NSString stringWithFormat:@"%@.dat", [[NSString stringWithFormat:@"%@%@%@", _url, _type, self.dictionary] MD5Digest]];
+    
+    return [[paths objectAtIndex:0]
+                 stringByAppendingPathComponent:path];
+}
 @end

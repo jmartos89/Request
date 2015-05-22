@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "NSString+MD5.h"
 
 @protocol RequestDelegate <NSObject>
 @required
@@ -27,10 +28,18 @@
     
     /** Alerta mientras esta el proceso de verificacion **/
     UIAlertView *_alertViewLog;
+    
+    /** Variable para controlar si tenemos datos esperados **/
+    Boolean _hasExpected;
+
 }
+
+extern NSString *const POST;
+extern NSString *const GET;
 
 /** URL to request **/
 @property (nonatomic,strong) NSString *_url;
+@property (nonatomic,strong) NSString *type;
 
 /** JSON **/
 @property (nonatomic,strong) id _responseObject;
