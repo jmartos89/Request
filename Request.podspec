@@ -9,7 +9,8 @@
 
 Pod::Spec.new do |s|
   s.name             = "Request"
-  s.version          = "0.1.0"
+p
+  s.version          = "0.1."
   s.summary          = "A library to facilitate requests to a server"
   s.description      = <<-DESC
                        A library to facilitate requests to a server
@@ -34,4 +35,5 @@ Pod::Spec.new do |s|
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'SVProgressHUD'
 end

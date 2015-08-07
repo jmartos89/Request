@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "NSString+MD5.h"
 
+/** SVProgressHUD **/
+#import "SVProgressHUD.h"
+
 @protocol RequestDelegate <NSObject>
 @required
 - (void) request: (id) object;
@@ -31,7 +34,6 @@
     
     /** Variable para controlar si tenemos datos esperados **/
     Boolean _hasExpected;
-
 }
 
 extern NSString *const POST;
@@ -45,6 +47,12 @@ extern NSString *const GET;
 @property (nonatomic,strong) id _responseObject;
 @property (nonatomic,strong) id delegate;
 @property (nonatomic,strong) NSDictionary *dictionary;
+
+/** HasCache **/
+@property Boolean hasCache;
+
+/** More Content Types**/
+@property NSArray *contentTypes;
 
 -(void) request: (NSDictionary*) params;
 -(void) setExpected:(NSDictionary*)expected;

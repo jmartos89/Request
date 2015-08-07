@@ -19,15 +19,22 @@ NSString *const GET = @"get";
 
 -(void)request: (NSDictionary*) params{
     
+    [SVProgressHUD show];
+    
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    manager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
     [self setDictionary:params];
+    
+    /** Comprobamos si tenemos mas content types que añadir **/
+    for(NSString *contentType in self.contentTypes){
+        manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.acceptableContentTypes setByAddingObject:contentType];
+    }
     
     /** Comprobamos si tenemos cache para esta peticion **/
     NSArray * cache = [self getCache];
-    
-    if(cache){
+
+    if(cache && self.hasCache){
         _responseObject = cache;
         [self.delegate request:self];
     }else{
@@ -43,10 +50,13 @@ NSString *const GET = @"get";
     [manager GET:_url parameters:self.dictionary
           success:^(AFHTTPRequestOperation *operation, id responseObject)
      {
+         [SVProgressHUD dismiss];
          [self checkObject:responseObject];
      }failure:
      ^(AFHTTPRequestOperation *operation, NSError *error) {
-         NSLog(@"El error es: %@", [error description]);
+          NSLog(@"Error: %@", error);
+         
+         [SVProgressHUD dismiss];
          [self.delegate noRequest:self];
      }];
 
@@ -56,10 +66,14 @@ NSString *const GET = @"get";
     [manager POST:_url parameters:self.dictionary
           success:^(AFHTTPRequestOperation *operation, id responseObject)
      {
+         
+        [SVProgressHUD dismiss];
         [self checkObject:responseObject];
      }failure:
      ^(AFHTTPRequestOperation *operation, NSError *error) {
          NSLog(@"El error es: %@", [error description]);
+         
+         [SVProgressHUD dismiss];
          [self.delegate noRequest:self];
      }];
 }
