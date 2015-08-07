@@ -7,10 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NSString+MD5.h"
+#import <NSString+MD5.h>
 
 /** SVProgressHUD **/
-#import "SVProgressHUD.h"
+#import <SVProgressHUD.h>
 
 @protocol RequestDelegate <NSObject>
 @required
