@@ -10,7 +10,7 @@
 Pod::Spec.new do |s|
   s.name             = "Request"
 p
-  s.version          = "0.1."
+  s.version          = "0.1.0"
   s.summary          = "A library to facilitate requests to a server"
   s.description      = <<-DESC
                        A library to facilitate requests to a server
@@ -34,7 +34,7 @@ p
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
-  s.dependency 'MD5Digest', :head
+  s.dependency 'MD5Digest'
   s.dependency 'AFNetworking', '~> 2.3'
-  s.dependency 'SVProgressHUD', :head
-end
+  s.dependency 'SVProgressHUD'
+  end
