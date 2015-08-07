@@ -34,7 +34,7 @@ p
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
+  s.dependency 'MD5Digest', :head
   s.dependency 'AFNetworking', '~> 2.3'
   s.dependency 'SVProgressHUD', :head
-  s.dependency 'MD5Digest', :head
 end
