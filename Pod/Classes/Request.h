@@ -1,21 +1,19 @@
 //
-//  Request.m
+//  request.h
 //  Request
 //
 //  Created by Juan Martos Caceres on 12/08/14.
-//  Copyright (c) Juan Martos. All rights reserved.
+//  Copyright (c) 2014 Sopinet. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
-#import <NSString+MD5.h>
-
-/** SVProgressHUD **/
-#import <SVProgressHUD.h>
+#import <AFNetworking/AFNetworking.h>
 
 @protocol RequestDelegate <NSObject>
 @required
 - (void) request: (id) object;
 - (void) noRequest: (id) object;
+- (void) updateVideo: (NSString*) identifier porcentage:(int) porcentage;
 @end
 
 @interface Request : NSObject {
@@ -31,33 +29,20 @@
     
     /** Alerta mientras esta el proceso de verificacion **/
     UIAlertView *_alertViewLog;
-    
-    /** Variable para controlar si tenemos datos esperados **/
-    Boolean _hasExpected;
 }
 
-extern NSString *const POST;
-extern NSString *const GET;
-
-/** URL to request **/
+/** URL to Login **/
 @property (nonatomic,strong) NSString *_url;
-@property (nonatomic,strong) NSString *type;
-
 /** JSON **/
 @property (nonatomic,strong) id _responseObject;
 @property (nonatomic,strong) id delegate;
 @property (nonatomic,strong) NSDictionary *dictionary;
+@property (nonatomic, strong) AFHTTPRequestOperationManager *manager;
 
-/** HasCache **/
-@property Boolean hasCache;
-
-/** More Content Types**/
-@property NSArray *contentTypes;
-
+-(Request*) init;
 -(void) request: (NSDictionary*) params;
 -(void) setExpected:(NSDictionary*)expected;
 -(void) setUrl:(NSString*) url;
--(UIAlertView*) getAlertRequest;
 -(void) dismissAlertLog;
 
 
@@ -68,4 +53,5 @@ extern NSString *const GET;
 -(void) requestVideo: (NSDictionary*) params andVideo: (NSData *) video;
 
 @end
+
 
