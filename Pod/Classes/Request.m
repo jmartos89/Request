@@ -132,7 +132,7 @@
         
         NSString *identifier = [params objectForKey:@"msgid"];
 
-        int porcentage = [[NSNumber numberWithInt:((x*100)/y)] intValue];
+        int porcentage = (int)[[NSNumber numberWithInt:((x*100)/y)] intValue];
         
         if(porcentage %5 == 0){
             [self.delegate updateVideo:identifier porcentage:(int)porcentage];
