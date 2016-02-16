@@ -1,118 +1,81 @@
 //
-//  Request.m
-//  Request
+//  Login.m
+//  Optica
 //
 //  Created by Juan Martos Caceres on 12/08/14.
-//  Copyright (c) Juan Martos. All rights reserved.
+//  Copyright (c) 2014 Sopinet. All rights reserved.
 //
 
 #import "Request.h"
-#import <AFNetworking/AFNetworking.h>
 
 @implementation Request
-
-NSString *const POST = @"post";
-NSString *const GET = @"get";
 
 @synthesize _responseObject;
 @synthesize _url;
 
+-(Request*) init{
+    self = [super init];
+    self.manager = [AFHTTPRequestOperationManager manager];
+    self.manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    self.manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    return self;
+}
+
 -(void)request: (NSDictionary*) params{
-    
-    [SVProgressHUD show];
-    
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
     [self setDictionary:params];
     
-    /** Comprobamos si tenemos mas content types que añadir **/
-    for(NSString *contentType in self.contentTypes){
-        manager.responseSerializer.acceptableContentTypes = [manager.responseSerializer.acceptableContentTypes setByAddingObject:contentType];
-    }
-    
-    /** Comprobamos si tenemos cache para esta peticion **/
-    NSArray * cache = [self getCache];
-
-    if(cache && self.hasCache){
-        _responseObject = cache;
-        [self.delegate request:self];
-    }else{
-        if([_type isEqual:POST]){
-            [self post:manager];
-        }else if([_type isEqual:GET]){
-            [self get:manager];
-        }
-    }
-}
-
--(void) get:(AFHTTPRequestOperationManager *) manager{
-    [manager GET:_url parameters:self.dictionary
-          success:^(AFHTTPRequestOperation *operation, id responseObject)
-     {
-         [SVProgressHUD dismiss];
-         [self checkObject:responseObject];
-     }failure:
-     ^(AFHTTPRequestOperation *operation, NSError *error) {
-          NSLog(@"Error: %@", error);
-         
-         [SVProgressHUD dismiss];
-         [self.delegate noRequest:self];
-     }];
-
-}
-
--(void) post:(AFHTTPRequestOperationManager *) manager{
-    [manager POST:_url parameters:self.dictionary
+    [self.manager POST:_url parameters:params
           success:^(AFHTTPRequestOperation *operation, id responseObject)
      {
          
-        [SVProgressHUD dismiss];
-        [self checkObject:responseObject];
+         NSString *expected1 = [NSString stringWithFormat:@"%@",[responseObject objectForKey:[_expected objectForKey:@"expected1"]] ];
+         NSString *value1 = [_expected objectForKey:@"value1"];
+         NSString *expected2 = [NSString stringWithFormat:@"%@",[responseObject objectForKey:[_expected objectForKey:@"expected2"]] ];
+         NSString *value2 = [_expected objectForKey:@"value2"];
+         
+         if([expected1 isEqualToString:value1] && [expected2 isEqualToString:value2]){
+             _responseObject = responseObject;
+             [self.delegate request:self];
+         }else{
+             [self.delegate noRequest:self];
+         }
+
+         
      }failure:
      ^(AFHTTPRequestOperation *operation, NSError *error) {
-         NSLog(@"El error es: %@", [error description]);
-         
-         [SVProgressHUD dismiss];
-         [self.delegate noRequest:self];
+         NSLog(@"Error: %@", error);
      }];
 }
 
--(void) checkObject: (id) responseObject{
-    Boolean complete = false;
-    
-    if(_hasExpected){
-        NSString *expected1 = [NSString stringWithFormat:@"%@",[responseObject objectForKey:[_expected objectForKey:@"expected1"]] ];
-        NSString *value1 = [_expected objectForKey:@"value1"];
-        NSString *expected2 = [NSString stringWithFormat:@"%@",[responseObject objectForKey:[_expected objectForKey:@"expected2"]] ];
-        NSString *value2 = [_expected objectForKey:@"value2"];
+/*
+-(void)requestImage: (NSDictionary*) params andImage: (NSData *) img{
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:_url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+        [formData appendPartWithFileData:img name:@"file" fileName:@"file.jpg" mimeType:@"image/jpeg"];
         
-        if([expected1 isEqualToString:value1] && [expected2 isEqualToString:value2]){
-            complete = true;
-        }
-    }else{
-        complete = true;
-    }
+    } error:nil];
     
-    if(complete){
-        _responseObject = responseObject;
-        //Guardamos en cache
-        [self saveInDisk];
-        [self.delegate request:self];
-    }else{
-        [self.delegate noRequest:self];
-    }
+    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+    
+    NSProgress *progress = nil;
+    
+    NSURLSessionUploadTask *uploadTask = [manager uploadTaskWithStreamedRequest:request progress:&progress completionHandler:^(NSURLResponse *response, id responseObject, NSError *error) {
+        if (error) {
+            NSLog(@"Error: %@", [error description]);
+        } else {
+            NSLog(@"%@ %@", response, responseObject);
+        }
+    }];
+    
+    [uploadTask resume];
+
 }
+ 
+ */
 
 -(void)requestImage: (NSDictionary*) params andImage: (NSData *) img{
-    
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    
     [self setDictionary:params];
     
-    AFHTTPRequestOperation *op = [manager POST:_url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    AFHTTPRequestOperation *op = [self.manager POST:_url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
          [formData appendPartWithFileData:img name:@"file" fileName:@"file.jpg" mimeType:@"image/jpeg"];
     } success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSLog(@"Success: %@", responseObject);
@@ -125,6 +88,7 @@ NSString *const GET = @"get";
         //long long int x = totalBytesWritten;
         //long long int y = totalBytesExpectedToWrite;
         
+        //NSLog(@"x = %lld@ y = %lld",x, y);
     }];
     
     [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -151,15 +115,10 @@ NSString *const GET = @"get";
     [op start];
 }
 
--(void) requestVideo: (NSDictionary*) params andVideo: (NSData *) video{
-    
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
-    manager.responseSerializer = [AFJSONResponseSerializer serializer];
-    
+-(void) requestVideo: (NSDictionary*) params andVideo: (NSData *) video { 
     [self setDictionary:params];
     
-    AFHTTPRequestOperation *op = [manager POST:_url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+    AFHTTPRequestOperation *op = [self.manager POST:_url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:video name:@"file" fileName:@"file.mp4" mimeType:@"video/mp4"];
     } success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSLog(@"Success: %@", responseObject);
@@ -168,8 +127,16 @@ NSString *const GET = @"get";
     }];
     
     [op setUploadProgressBlock:^(NSUInteger bytesWritten, long long totalBytesWritten, long long totalBytesExpectedToWrite){
-        //long long int x = totalBytesWritten;
-        //long long int y = totalBytesExpectedToWrite;
+        long long int x = totalBytesWritten;
+        long long int y = totalBytesExpectedToWrite;
+        
+        NSString *identifier = [params objectForKey:@"msgid"];
+
+        int porcentage = [[NSNumber numberWithInt:(((int)x*100)/(int)y)] intValue];
+        
+        if(porcentage %5 == 0){
+            [self.delegate updateVideo:identifier porcentage:(int)porcentage];
+        }
     }];
     
     [op setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -195,7 +162,6 @@ NSString *const GET = @"get";
 }
 
 -(void)setExpected:(NSDictionary*)expected{
-    _hasExpected = true;
     _expected = expected;
 }
 
@@ -204,7 +170,7 @@ NSString *const GET = @"get";
 }
 
 
--(UIAlertView*) getAlertRequest{
+-(UIAlertView*) getAlert{
     UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Peticion"
                                                       message:@"Se ha realizado correctamente"
                                                      delegate:nil
@@ -228,21 +194,4 @@ NSString *const GET = @"get";
     [_alertViewLog dismissWithClickedButtonIndex:-1 animated:YES];
 }
 
-#pragma marks - cache
--(void) saveInDisk{
-    [_responseObject writeToFile: [self getPath] atomically:YES];
-}
-
--(NSArray*) getCache{
-    return [NSArray arrayWithContentsOfFile: [self getPath]];
-}
-
--(NSString*) getPath{
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-                                                         NSUserDomainMask, YES);
-    NSString *path = [NSString stringWithFormat:@"%@.dat", [[NSString stringWithFormat:@"%@%@%@", _url, _type, self.dictionary] MD5Digest]];
-    
-    return [[paths objectAtIndex:0]
-                 stringByAppendingPathComponent:path];
-}
 @end
