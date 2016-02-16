@@ -136,6 +136,7 @@
         
         if(porcentage %5 == 0){
             [self.delegate updateVideo:identifier porcentage:(int)porcentage];
+            
         }
     }];
     
